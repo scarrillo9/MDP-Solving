@@ -15,7 +15,7 @@ public class main {
 		State TU10p = new State("tired", "undone", 22, RU10a, 2, RU8a, 0, null, 0, null, 0);
 		tState RU10p = new tState("rested", "undone", 22, RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2);
 		tState RD10p = new tState("rested", "done", 22, RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2);
-		State RU8p = new State("tired", "undone", 22, TU10p, 2, RU10p, 0, RD10p, -1, null, 0);
+		State RU8p = new State("rested", "undone", 22, TU10p, 2, RU10p, 0, RD10p, -1, null, 0);
 		return RU8p;
 	}//end initStates
 	
