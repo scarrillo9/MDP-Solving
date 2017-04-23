@@ -15,8 +15,43 @@ public class main {
 	static State start = RU8p;
 	
 	public static void main(String[] args){
-		monteCarlo(start);
+		//monteCarlo(start);
+		qLearning(start);
 	}//end main method
+	
+	public static void qLearning(State start){
+		qArrays(); //setting up arrays for Q values
+		double alpha = 0.1;
+		double lambda = 0.99;
+		boolean maxChange = false;
+		int episodes = 0;
+		State temp = start;
+		
+		while(!maxChange){
+			
+			while(!temp.finalState){
+				episodes++;
+				
+				int nextState = chooseNextState(temp);
+				int tempReward = getReward(temp, nextState);
+				System.out.printf("\nState: " + temp.health + "/" + temp.homework
+						+ " prevValue- " + temp.qValues[nextState] + " Reward- " + tempReward);
+				
+				double currValue = temp.qValues[nextState];
+				
+				//Q-learning: off policy
+				temp.qValues[nextState] += (alpha * (tempReward + (lambda * getState(temp, nextState).value) - temp.qValues[nextState]));
+				alpha *= lambda;
+				
+				if((temp.qValues[nextState] - currValue) < 0.001)
+					maxChange = true;
+				
+				temp = getState(temp, nextState);
+			}//end while
+			
+		}//end while loop
+		System.out.println("\nNumber of episodes: " + episodes);
+	}//end qLearning
 	
 	public static void monteCarlo(State start){
 		double alpha = 0.1;
@@ -91,6 +126,41 @@ public class main {
 		return null;
 	}//end getReward
 	
+	public static void qArrays(){
+		RU8p.qValues = qSetUp(RU8p);
+		TU10p.qValues = qSetUp(TU10p);
+		RU10p.qValues = qSetUp(RU10p);
+		RD10p.qValues = qSetUp(RD10p);
+		RU8a.qValues = qSetUp(RU8a);
+		RD8a.qValues = qSetUp(RD8a);
+		TU10a.qValues = qSetUp(TU10a);
+		RU10a.qValues = qSetUp(RU10a);
+		RD10a.qValues = qSetUp(RD10a);
+		TD10a.qValues = qSetUp(TD10a);
+	}
+	
+	public static double[] qSetUp(State curr){
+	        		  //party/rest/study/any/trans//
+		double[] qValues = {-1, -1, -1, -1, -1};
+		if(curr.actions == 1)
+			qValues[3] = 0;
+		if(curr.actions == 2){
+			if(curr.transitionState){
+				qValues[0] = qValues[1] = qValues[4] = 0;
+			}//if transition
+			else
+				qValues[0] = qValues[1] = 0;
+		}//end if 2 actions
+		if(curr.actions == 3){
+			if(curr.transitionState){
+				qValues[0] = qValues[1] = qValues[2] = qValues[4] = 0;
+			}//if transition
+			else
+				qValues[0] = qValues[1] = qValues[2] = 0;
+		}//end if 3 actions
+		
+		return qValues;
+}//end qSetUp
 
 //	 * 1 = party
 //	 * 2 = rest

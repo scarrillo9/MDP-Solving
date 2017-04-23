@@ -17,6 +17,7 @@ public class State {
 	boolean finalState;
 	boolean transitionState;
 	double tProbability;
+	double[] qValues;
 	
 	public State(){
 		finalState = true;
@@ -65,7 +66,6 @@ public class State {
 		finalState = false;
 		transitionState = true;
 	}//end constructor
-	
 	
 	
 }//end State
