@@ -1,55 +1,67 @@
 import java.util.concurrent.ThreadLocalRandom;
 
 public class main {
+	static State end = new State();
+	static State TU10a = new State("tired", "undone", "10AM", null, 0, null, 0, null, 0, end, -1, 1);
+	static State RU10a = new State("rested", "undone", "10AM", null, 0, null, 0, null, 0, end, 0, 1);
+	static State RD10a = new State("rested", "done", "10AM", null, 0, null, 0, null, 0, end, 4, 1);
+	static State TD10a = new State("tired", "done", "10AM", null, 0, null, 0, null, 0, end, 3, 1);
+	static State RU8a = new State("rested", "undone", "8AM", TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
+	static State RD8a = new State("rested", "done", "8AM", TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
+	static State TU10p = new State("tired", "undone", "10PM", RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
+	static State RU10p = new State("rested", "undone", "10PM", RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
+	static State RD10p = new State("rested", "done", "10PM", RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
+	static State RU8p = new State("rested", "undone", "8PM", TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
+	static State start = RU8p;
+	
 	public static void main(String[] args){
-		State start = initStates();
-		for(int i = 0; i < 50; i++){
-			System.out.printf("Episode %d:\n", i+1);
-			monteCarlo(start);
-		}//end for loop
+		monteCarlo(start);
 	}//end main method
 	
 	public static void monteCarlo(State start){
 		double alpha = 0.1;
 		State temp = start;
-		int currReward = 0;
+		int[] currReward = new int[50];
+		double avgReward = 0;
 		
-		//for(int i = 0; i < 50; i++){
-			//System.out.printf("Episode %d\n", i+1);
+		for(int i = 0; i < 50; i++){
+			System.out.printf("Episode %d\n", i+1);
+			
 			while(!temp.finalState){
-				System.out.printf("%s/%s Time: %d\n", temp.health, temp.homework, temp.time);
-				//State temp = rstart;
+				System.out.printf("%s/%s Time: %s\n", temp.health, temp.homework, temp.time);
 				
 				int nextState = chooseNextState(temp);
-				System.out.printf("nextstate: %d\n", nextState);
 				int tempReward = getReward(temp, nextState);
+				
+				//constant alpha-MC
 				temp.value += (alpha * (tempReward - temp.value));
-				currReward += tempReward;
+				
+				currReward[i] += tempReward;
 				temp = getState(temp, nextState);
-				//System.out.printf("\nCurrent state: %s/%s Time: %d %s", temp.health, temp.homework, temp.time, temp.finalState);
 			}//end while
-			System.out.println();
+			
+			System.out.printf("Reward: %d\n\n", currReward[i]);
+			avgReward += currReward[i];
 			temp = start;
-		//}//end 50 episodes
-		
-
+		}//end 50 episodes
+		avgReward /= 50;
+		stateValues();
+		System.out.println("\n\nAverage reward for Monte Carlo: " + avgReward);
 	}//end monteCarlo 
 	
-	
-	public static State initStates(){ //party // rest // study
-		State end = new State();
-		State TU10a = new State("tired", "undone", 1000, null, 0, null, 0, null, 0, end, -1, 1);
-		State RU10a = new State("rested", "undone", 1000, null, 0, null, 0, null, 0, end, 0, 1);
-		State RD10a = new State("rested", "done", 1000, null, 0, null, 0, null, 0, end, 4, 1);
-		State TD10a = new State("tired", "done", 1000, null, 0, null, 0, null, 0, end, 3, 1);
-		State RU8a = new State("rested", "undone", 800, TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
-		State RD8a = new State("rested", "done", 800, TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
-		State TU10p = new State("tired", "undone", 2200, RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
-		State RU10p = new tState("rested", "undone", 2200, RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
-		State RD10p = new tState("rested", "done", 2200, RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
-		State RU8p = new State("rested", "undone", 2000, TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
-		return RU8p;
-	}//end initStates
+	public static void stateValues(){
+		System.out.printf("Values of States:\n");
+		System.out.printf("State: RU8p, Value: " + RU8p.value);
+		System.out.printf("\nState: TU10p, Value: " + TU10p.value);
+		System.out.printf("\nState: RU10p, Value: " + RU10p.value);
+		System.out.printf("\nState: RD10p, Value: " + RD10p.value);
+		System.out.printf("\nState: RU8a, Value: " + RU8a.value);
+		System.out.printf("\nState: RD8a, Value: " + RD8a.value);
+		System.out.printf("\nState: TU10a, Value: " + TU10a.value);
+		System.out.printf("\nState: RU10a, Value: " + RU10a.value);
+		System.out.printf("\nState: RD10a, Value: " + RD10a.value);
+		System.out.printf("\nState: TD10a, Value: " + TD10a.value);
+	}//end stateValues
 	
 	public static int getReward(State curr, int state){
 		if(state == 1)
@@ -79,12 +91,12 @@ public class main {
 		return null;
 	}//end getReward
 	
-	/*
-	 * 1 = party
-	 * 2 = rest
-	 * 3 = study 
-	 * 4 = any
-	 */
+
+//	 * 1 = party
+//	 * 2 = rest
+//	 * 3 = study 
+//	 * 4 = any
+//	 * 5 = transitive party state
 	public static int chooseNextState(State curr){
 		if(curr.actions == 1){
 			return 4;

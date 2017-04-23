@@ -1,10 +1,8 @@
-import java.util.concurrent.ThreadLocalRandom;
-
 public class State {
 	double value;
 	String health;
 	String homework;
-	int time;
+	String time;
 	State afterParty;
 	int partyReward;
 	State afterRest;
@@ -24,7 +22,7 @@ public class State {
 		finalState = true;
 	}//end empty constructor
 	
-	public State(String health, String homework, int time, State party, 
+	public State(String health, String homework, String time, State party, 
 			int partyReward, State rest, int restReward, State study, 
 			int studyReward, State any, int anyReward, int actions){
 		value = 0;
@@ -44,7 +42,7 @@ public class State {
 		transitionState = false;
 	}//end constructor
 	
-	public State(String health, String homework, int time, State party, 
+	public State(String health, String homework, String time, State party, 
 			int partyReward, State rest, int restReward, State study, 
 			int studyReward, State any, int anyReward, double transition,
 			State party2, int partyReward2, int actions){
@@ -70,4 +68,4 @@ public class State {
 	
 	
 	
-}
+}//end State
