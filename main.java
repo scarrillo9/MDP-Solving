@@ -3,7 +3,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class main {
 	public static void main(String[] args){
 		State start = initStates();
-		monteCarlo(start);
+		for(int i = 0; i < 50; i++){
+			System.out.printf("Episode %d:\n", i+1);
+			monteCarlo(start);
+		}//end for loop
 	}//end main method
 	
 	public static void monteCarlo(State start){
@@ -14,10 +17,11 @@ public class main {
 		//for(int i = 0; i < 50; i++){
 			//System.out.printf("Episode %d\n", i+1);
 			while(!temp.finalState){
-				System.out.printf("Current state: %s/%s Time: %d\n", temp.health, temp.homework, temp.time);
+				System.out.printf("%s/%s Time: %d\n", temp.health, temp.homework, temp.time);
 				//State temp = rstart;
 				
 				int nextState = chooseNextState(temp);
+				System.out.printf("nextstate: %d\n", nextState);
 				int tempReward = getReward(temp, nextState);
 				temp.value += (alpha * (tempReward - temp.value));
 				currReward += tempReward;
@@ -34,16 +38,16 @@ public class main {
 	
 	public static State initStates(){ //party // rest // study
 		State end = new State();
-		State TU10a = new State("tired", "undone", 10, null, 0, null, 0, null, 0, end, -1, 1);
-		State RU10a = new State("rested", "undone", 10, null, 0, null, 0, null, 0, end, 0, 1);
-		State RD10a = new State("rested", "done", 10, null, 0, null, 0, null, 0, end, 4, 1);
-		State TD10a = new State("tired", "done", 10, null, 0, null, 0, null, 0, end, 3, 1);
-		State RU8a = new State("rested", "undone", 8, TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
-		State RD8a = new State("rested", "done", 8, TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
-		State TU10p = new State("tired", "undone", 22, RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
-		State RU10p = new tState("rested", "undone", 22, RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
-		State RD10p = new tState("rested", "done", 22, RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
-		State RU8p = new State("rested", "undone", 20, TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
+		State TU10a = new State("tired", "undone", 1000, null, 0, null, 0, null, 0, end, -1, 1);
+		State RU10a = new State("rested", "undone", 1000, null, 0, null, 0, null, 0, end, 0, 1);
+		State RD10a = new State("rested", "done", 1000, null, 0, null, 0, null, 0, end, 4, 1);
+		State TD10a = new State("tired", "done", 1000, null, 0, null, 0, null, 0, end, 3, 1);
+		State RU8a = new State("rested", "undone", 800, TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
+		State RD8a = new State("rested", "done", 800, TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
+		State TU10p = new State("tired", "undone", 2200, RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
+		State RU10p = new tState("rested", "undone", 2200, RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
+		State RD10p = new tState("rested", "done", 2200, RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
+		State RU8p = new State("rested", "undone", 2000, TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
 		return RU8p;
 	}//end initStates
 	
