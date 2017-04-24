@@ -1,22 +1,34 @@
+import java.text.DecimalFormat;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Scanner;
 
 public class main {
+	static DecimalFormat df = new DecimalFormat("#.##");
 	static State end = new State();
-	static State TU10a = new State("tired", "undone", "10AM", null, 0, null, 0, null, 0, end, -1, 1);
-	static State RU10a = new State("rested", "undone", "10AM", null, 0, null, 0, null, 0, end, 0, 1);
-	static State RD10a = new State("rested", "done", "10AM", null, 0, null, 0, null, 0, end, 4, 1);
-	static State TD10a = new State("tired", "done", "10AM", null, 0, null, 0, null, 0, end, 3, 1);
-	static State RU8a = new State("rested", "undone", "8AM", TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
-	static State RD8a = new State("rested", "done", "8AM", TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
-	static State TU10p = new State("tired", "undone", "10PM", RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
-	static State RU10p = new State("rested", "undone", "10PM", RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
-	static State RD10p = new State("rested", "done", "10PM", RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
-	static State RU8p = new State("rested", "undone", "8PM", TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
+	static State TU10a = new State("T", "U", "10AM", null, 0, null, 0, null, 0, end, -1, 1);
+	static State RU10a = new State("R", "U", "10AM", null, 0, null, 0, null, 0, end, 0, 1);
+	static State RD10a = new State("R", "D", "10AM", null, 0, null, 0, null, 0, end, 4, 1);
+	static State TD10a = new State("T", "D", "10AM", null, 0, null, 0, null, 0, end, 3, 1);
+	static State RU8a = new State("R", "U", "8AM", TU10a, 2, RU10a, 0, RD10a, -1, null, 0, 3);
+	static State RD8a = new State("R", "D", "8AM", TD10a, 2, RD10a, 0, null, 0, null, 0, 2);
+	static State TU10p = new State("T", "U", "10PM", RU10a, 2, RU8a, 0, null, 0, null, 0, 2);
+	static State RU10p = new State("R", "U", "10PM", RU8a, 2, RU8a, 0, RD8a, -1, null, 0, .5, RU10a, 2, 3);
+	static State RD10p = new State("R", "D", "10PM", RU8a, 2, RD8a, 0, null, 0, null, 0, .5, RD10a, 2, 2);
+	static State RU8p = new State("R", "U", "8PM", TU10p, 2, RU10p, 0, RD10p, -1, null, 0, 3);
 	static State start = RU8p;
 	
 	public static void main(String[] args){
-		//monteCarlo(start);
-		qLearning(start);
+		Scanner input = new Scanner(System.in);
+		System.out.println("Choose Markov Decision Process:\nMonte Carlo? (m)"
+				+ "\nValue Iteration? (i)\nQ Learning? (q)");
+		String option = input.next();
+		
+		if(option.equals("m"))
+			monteCarlo(start);
+		//if(option.equals("i"))
+			
+		if(option.equals("q"))	
+			qLearning(start);
 	}//end main method
 	
 	public static void qLearning(State start){
@@ -26,28 +38,32 @@ public class main {
 		boolean maxChange = false;
 		int episodes = 0;
 		State temp = start;
-		
+		System.out.println("Q Learning:\nState, Reward >> PreviousValue->CurrentValue");
 		while(!maxChange){
-			
+			System.out.printf("Episode " + (episodes+1) + ": ");
 			while(!temp.finalState){
-				episodes++;
 				
 				int nextState = chooseNextState(temp);
 				int tempReward = getReward(temp, nextState);
-				System.out.printf("\nState: " + temp.health + "/" + temp.homework
-						+ " prevValue- " + temp.qValues[nextState] + " Reward- " + tempReward);
+				System.out.printf(temp.health + "/" + temp.homework + ", rw: " + tempReward + " >> " 
+						+ df.format(temp.qValues[nextState-1]) + " -> ");
 				
-				double currValue = temp.qValues[nextState];
+				double currValue = temp.qValues[nextState-1];
 				
 				//Q-learning: off policy
-				temp.qValues[nextState] += (alpha * (tempReward + (lambda * getState(temp, nextState).value) - temp.qValues[nextState]));
-				alpha *= lambda;
+				double newValue = currValue + (alpha * (tempReward + (lambda * getState(temp, nextState).value) - temp.qValues[nextState-1]));
+				temp.qValues[nextState-1] = newValue;
+				System.out.printf(df.format(temp.qValues[nextState-1]) + " || ");
 				
-				if((temp.qValues[nextState] - currValue) < 0.001)
+				if(((newValue - currValue) < 0.001) && ((newValue - currValue) > 0)){
 					maxChange = true;
-				
+				}
 				temp = getState(temp, nextState);
 			}//end while
+			System.out.println();
+			alpha *= lambda;
+			temp = start;
+			episodes++;
 			
 		}//end while loop
 		System.out.println("\nNumber of episodes: " + episodes);
