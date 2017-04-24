@@ -67,6 +67,7 @@ public class main {
 			
 		}//end while loop
 		System.out.println("\nNumber of episodes: " + episodes);
+		stateValuesQ();
 	}//end qLearning
 	
 	public static void monteCarlo(State start){
@@ -113,6 +114,43 @@ public class main {
 		System.out.printf("\nState: RD10a, Value: " + RD10a.value);
 		System.out.printf("\nState: TD10a, Value: " + TD10a.value);
 	}//end stateValues
+	
+	public static void stateValuesQ(){
+		System.out.printf("Values of States:\n");
+		System.out.printf("State: RU8p, Values: "); printValuesQ(RU8p);
+		System.out.printf("\nState: TU10p, Value: "); printValuesQ(TU10p);
+		System.out.printf("\nState: RU10p, Value: "); printValuesQ(RU10p);
+		System.out.printf("\nState: RD10p, Value: "); printValuesQ(RD10p);
+		System.out.printf("\nState: RU8a, Value: "); printValuesQ(RU8a);
+		System.out.printf("\nState: RD8a, Value: "); printValuesQ(RD8a);
+		System.out.printf("\nState: TU10a, Value: "); printValuesQ(TU10p);
+		System.out.printf("\nState: RU10a, Value: "); printValuesQ(RU10a);
+		System.out.printf("\nState: RD10a, Value: "); printValuesQ(RD10a);
+		System.out.printf("\nState: TD10a, Value: "); printValuesQ(TD10a);
+	}//end stateValues
+	
+	public static void printValuesQ(State curr){
+				  //party/rest/study/any/trans//
+		if(curr.actions == 1)
+			System.out.printf("/any: " + df.format(curr.qValues[3]));
+		if(curr.actions == 2){
+			if(curr.transitionState){
+				System.out.printf("/party: " + df.format(curr.qValues[0]) + " /rest: " + df.format(curr.qValues[1])
+						+ " /party2: " + df.format(curr.qValues[4]));
+			}//if transition
+			else
+				System.out.printf("/party: " + df.format(curr.qValues[0]) + " /rest: " + df.format(curr.qValues[1]));
+			}//end if 2 actions
+		if(curr.actions == 3){
+			if(curr.transitionState){
+				System.out.printf("/party: " + df.format(curr.qValues[0]) + " /rest: " + df.format(curr.qValues[1])
+					+ " /study: " + df.format(curr.qValues[2]) + " /party2: " + df.format(curr.qValues[4]));
+			}//if transition
+			else
+				System.out.printf("/party: " + df.format(curr.qValues[0]) + " /rest: " + df.format(curr.qValues[1])
+					+ " /study: " + df.format(curr.qValues[2]));
+			}//end if 3 actions
+	}//end stateValueQ
 	
 	public static int getReward(State curr, int state){
 		if(state == 1)
